@@ -1,37 +1,90 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import os
-from subprocess import call
 
 from utils import PostOperator, PresenceChecker, ButtonGetter
 
 CHROME_DRIVER_LOCATION = './chromedriver'
 URL = "https://www.tumblr.com/"
 
+EMAIL = os.environ['EMAIL']
+PASSWORD = os.environ['PASSWORD']
+POST_NOTE = os.environ['POST_NOTE']
+
 INITIAL_NUMBER_OF_POSTS_TO_SHOW = 38
 
 FOLLOWING_INDEX = 3
 FIRST_POST_INDEX = 2
 
-SESSION_URL = os.environ['SESSION_URL']
-SESSION_ID = os.environ['SESSION_ID']
-
-INBOX_PATH = '/inbox'
 
 class AccountTest(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Remote(command_executor = SESSION_URL, desired_capabilities={})
-        self.driver.session_id = SESSION_ID
-        print('called:', call(['xdotool','getwindowfocus','windowkill']))
-        self.driver.get(URL + "/dashboard")
+        self.driver = webdriver.Chrome(CHROME_DRIVER_LOCATION)
+        self.driver.get(URL + "/login")
+
+    def login(self):
+        driver = self.driver
+        
+        email_field = self.driver.find_element_by_id("signup_determine_email")
+        email_field.send_keys(EMAIL)
+        email_field.send_keys(Keys.RETURN)
+
+        time.sleep(2)
+
+        password_field = self.driver.find_element_by_id("signup_password")
+        password_field.send_keys(PASSWORD)
+        password_field.send_keys(Keys.RETURN)
+
+        assert "Sign up" not in driver.title
 
     def tearDown(self):
-        pass
-        #self.driver.close()
+        self.driver.close()
+
+    def get_dismiss_titles(self):
+        return self.driver.find_elements_by_class_name("tumblelog_title");
+
+    def get_following(self):
+        following = []
+        for item in self.driver.find_elements_by_class_name("name-link"):
+            following.append(item.text)
+        return following
+
+    def get_follower_links(self):
+        return self.driver.find_elements_by_class_name("follow_list_item_blog")
+
+    def get_liked_count(self):
+        self.driver.find_element_by_id('account_button').click()
+        time.sleep(1)
+        try:
+            for item in self.driver.find_elements_by_class_name('popover_menu_item_anchor'):
+                if item.get_attribute('href') == URL + 'likes':
+                    return item.find_element_by_class_name("popover_item_suffix").text
+        finally:
+            self.driver.find_element_by_id('account_button').click()
+
+    def get_posted_count(self):
+        self.driver.find_element_by_id('account_button').click()
+        time.sleep(1)
+        try:
+            for item in self.driver.find_elements_by_class_name('blog-sub-nav-item-link'):
+                if item.find_element_by_class_name('blog-sub-nav-item-label').text == 'Posts':
+                    return int(str(item.find_element_by_class_name("blog-sub-nav-item-data").text))
+        finally:
+            self.driver.find_element_by_id('account_button').click()
+
+    def get_reblog_text_field(self):
+        return self.driver.find_element_by_class_name('editor-richtext')
+
+    def get_post_avatar_link(self):
+        return self.driver.find_element_by_class_name('post_avatar_link')
+
+    ############
 
     def get_language_selector(self):
         return self.driver.find_element_by_id('user_language')
@@ -41,7 +94,7 @@ class SettingsTest(AccountTest):
 
     def test_changing_settings_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
         presence_checker = PresenceChecker(driver)
@@ -126,7 +179,7 @@ class HelpTest(AccountTest):
 
     def test_calling_help_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
         presence_checker = PresenceChecker(driver)
@@ -146,7 +199,7 @@ class ActivityTest(AccountTest):
 
     def test_calling_activity_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
         presence_checker = PresenceChecker(driver)
@@ -160,12 +213,12 @@ class ActivityTest(AccountTest):
 
         self.assertTrue(presence_checker.is_there_activity_popover())
 
-@unittest.skip("skipping")
+#@unittest.skip("skipping")
 class MessagingTest(AccountTest):
 
     def test_messaging_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
         presence_checker = PresenceChecker(driver)
@@ -179,21 +232,8 @@ class MessagingTest(AccountTest):
 
         self.assertTrue(presence_checker.is_there_messaging_inbox())
 
-#@unittest.skip("skipping")
-class InboxTest(AccountTest):
 
-    def test_inbox_redirect_succeeded(self):
-        driver = self.driver
 
-        button_getter = ButtonGetter(driver)
-        presence_checker = PresenceChecker(driver)
-        post_operator = PostOperator(driver)
-
-        button_getter.get_inbox_button().click()
-
-        time.sleep(1)
-
-        self.assertTrue(INBOX_PATH in driver.current_url)
 
 if __name__ == "__main__":
     unittest.main()

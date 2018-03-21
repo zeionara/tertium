@@ -15,6 +15,22 @@ class PostOperator:
     def get_original_post_id(self, post):
     	return str(post.find_element_by_class_name('post-avatar-link').get_attribute('href')).split('/')[-1]
 
+    def get_text_post(self, post_original_title, post_original_body):
+        for post in self.get_posts():
+            try:
+                post_title = post.find_element_by_class_name('post_title')
+                post_body = post.find_element_by_class_name('post_body')
+            except:
+                continue
+            if ((post_original_title == post_title.text) and (post_original_body == post_body.text)):
+                return post
+
+    def get_control_menu_button(self, post):
+        return post.find_element_by_class_name('post_control_menu')
+
+    def get_delete_button(self, post):
+        return post.find_element_by_class_name('delete')
+
 class PresenceChecker:
 
     def __init__(self, driver):
@@ -194,3 +210,32 @@ class ButtonGetter:
 
     def get_messaging_button(self):
         return self.driver.find_element_by_id('messaging_button')
+
+    def get_discover_button(self):
+        return self.driver.find_element_by_id('discover_button')
+
+    def get_create_button(self):
+        return self.driver.find_element_by_class_name('compose-button')
+
+    def get_inbox_button(self):
+        return self.driver.find_element_by_id('inbox_button')
+
+    def get_discover_types_buttons(self):
+        return self.driver.find_element_by_class_name('types-tabs').find_elements_by_class_name('content-control')
+
+    def get_discover_search_buttons(self):
+        return self.driver.find_element_by_class_name('discover-search-terms').find_elements_by_class_name('discover-search-term')
+
+    def get_post_type_selection_button(self, post_type):
+        for button in self.driver.find_elements_by_class_name('tab-post-type'):
+            if (button.get_attribute('data-post-type') == post_type):
+                return button
+
+    def get_create_post_button(self):
+        return self.driver.find_element_by_class_name('create_post_button')
+
+    def get_posts_button(self):
+        for item in self.driver.find_elements_by_class_name('blog-sub-nav-item-link'):
+                if 'Posts' in item.text:
+                    return item
+

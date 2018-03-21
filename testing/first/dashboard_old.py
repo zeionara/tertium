@@ -4,34 +4,45 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import os
-from subprocess import call
 
 from utils import PostOperator, PresenceChecker, ButtonGetter
 
 CHROME_DRIVER_LOCATION = './chromedriver'
 URL = "https://www.tumblr.com/"
 
+EMAIL = os.environ['EMAIL']
+PASSWORD = os.environ['PASSWORD']
+POST_NOTE = os.environ['POST_NOTE']
+
 INITIAL_NUMBER_OF_POSTS_TO_SHOW = 38
 
 FOLLOWING_INDEX = 3
 FIRST_POST_INDEX = 2
 
-SESSION_URL = os.environ['SESSION_URL']
-SESSION_ID = os.environ['SESSION_ID']
-
-POST_NOTE = 'nice'
 
 class DashboardTest(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Remote(command_executor = SESSION_URL, desired_capabilities={})
-        self.driver.session_id = SESSION_ID
-        print('called:', call(['xdotool','getwindowfocus','windowkill']))
-        self.driver.get(URL + "/dashboard")
+        self.driver = webdriver.Chrome(CHROME_DRIVER_LOCATION)
+        self.driver.get(URL + "/login")
+
+    def login(self):
+        driver = self.driver
+        
+        email_field = self.driver.find_element_by_id("signup_determine_email")
+        email_field.send_keys(EMAIL)
+        email_field.send_keys(Keys.RETURN)
+
+        time.sleep(2)
+
+        password_field = self.driver.find_element_by_id("signup_password")
+        password_field.send_keys(PASSWORD)
+        password_field.send_keys(Keys.RETURN)
+
+        assert "Sign up" not in driver.title
 
     def tearDown(self):
-        pass
-        #self.driver.close()
+        self.driver.close()
 
     def get_dismiss_titles(self):
         return self.driver.find_elements_by_class_name("tumblelog_title");
@@ -76,14 +87,14 @@ class FollowSuccess(DashboardTest):
 
     def test_follow_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
 
         follow_buttons = button_getter.get_follow_buttons()
 
         followed_title = follow_buttons[FOLLOWING_INDEX].get_attribute('data-tumblelog-name')
-        follow_buttons[FOLLOWING_INDEX].send_keys(Keys.RETURN) #click
+        follow_buttons[FOLLOWING_INDEX].click()
 
         self.driver.get(URL + "/following")
 
@@ -95,8 +106,6 @@ class FollowSuccess(DashboardTest):
 
         driver.find_element_by_class_name("btn_1").click()
 
-        time.sleep(1)
-
         self.driver.refresh()
 
         assert followed_title not in self.get_following()
@@ -107,7 +116,7 @@ class DismissSuccess(DashboardTest):
 
     def test_dismiss_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
 
@@ -125,7 +134,7 @@ class ShowCommunityInfoSuccess(DashboardTest):
 
     def test_show_community_info(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         presence_checker = PresenceChecker(driver)
 
@@ -133,7 +142,7 @@ class ShowCommunityInfoSuccess(DashboardTest):
         self.assertFalse(presence_checker.is_there_glass_container())
 
         followers_links = self.get_follower_links()
-        followers_links[FOLLOWING_INDEX].send_keys(Keys.RETURN) #click
+        followers_links[FOLLOWING_INDEX].click()
 
         self.assertTrue(presence_checker.is_there_follower_container())
         self.assertTrue(presence_checker.is_there_glass_container())
@@ -143,7 +152,7 @@ class LikeSuccess(DashboardTest):
 
     def test_like_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         post_operator = PostOperator(driver)
         button_getter = ButtonGetter(driver)
@@ -188,7 +197,7 @@ class ShareSuccess(DashboardTest):
 
     def test_share_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
         presence_checker = PresenceChecker(driver)
@@ -234,7 +243,7 @@ class ReblogSuccess(DashboardTest):
 
     def test_reblog_succeeded(self):
         driver = self.driver
-        #self.login()
+        self.login()
 
         button_getter = ButtonGetter(driver)
         presence_checker = PresenceChecker(driver)

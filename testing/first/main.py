@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import os
+from subprocess import call
 
 CHROME_DRIVER_LOCATION = './chromedriver'
 URL = "https://www.tumblr.com/"
@@ -10,16 +11,22 @@ URL = "https://www.tumblr.com/"
 EMAIL = os.environ['EMAIL']
 PASSWORD = os.environ['PASSWORD']
 
+SESSION_URL = os.environ['SESSION_URL']
+SESSION_ID = os.environ['SESSION_ID']
+
 INITIAL_NUMBER_OF_POSTS_TO_SHOW = 38
 
 class LoginPageTest(unittest.TestCase):
     
     def setUp(self):
-        self.driver = webdriver.Chrome(CHROME_DRIVER_LOCATION)
+        self.driver = webdriver.Remote(command_executor = SESSION_URL, desired_capabilities={})
+        self.driver.session_id = SESSION_ID
+        print('called:', call(['xdotool','getwindowfocus','windowkill']))
         self.driver.get(URL)
 
     def tearDown(self):
-        self.driver.close()
+        pass
+        #self.driver.close()
 
     def get_signup_login_button(self):
         return self.driver.find_element_by_id("signup_login_button")
