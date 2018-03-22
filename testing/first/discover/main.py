@@ -6,11 +6,16 @@ import time
 import os
 from subprocess import call
 from random import randint
+import sys
+from os import path
 
-from utils import PostOperator, PresenceChecker, ButtonGetter
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+from post_operator import PostOperator
+from button_getter import ButtonGetter
 
 CHROME_DRIVER_LOCATION = './chromedriver'
-URL = "https://www.tumblr.com/"
+URL = "https://www.tumblr.com"
 
 INITIAL_NUMBER_OF_POSTS_TO_SHOW = 38
 
@@ -27,12 +32,11 @@ class DiscoverTest(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Remote(command_executor = SESSION_URL, desired_capabilities={})
         self.driver.session_id = SESSION_ID
-        print('called:', call(['xdotool','getwindowfocus','windowkill']))
+        call(['xdotool','getwindowfocus','windowkill'])
         self.driver.get(URL + "/dashboard")
 
     def tearDown(self):
         pass
-        #self.driver.close()
 
 #@unittest.skip("skipping")
 class CategoriesTest(DiscoverTest):
@@ -49,7 +53,7 @@ class CategoriesTest(DiscoverTest):
             if (button.is_displayed()):
                 button.click()
                 time.sleep(2)
-                self.assertTrue(len(post_operator.get_posts()) >= MIN_NUMBER_OF_POSTS)
+                assert len(post_operator.get_posts()) >= MIN_NUMBER_OF_POSTS
 
 #@unittest.skip("skipping")
 class QueriesTest(DiscoverTest):
@@ -69,9 +73,9 @@ class QueriesTest(DiscoverTest):
 
         discover_search_buttons[button_index].click()
 
-        self.assertTrue(query.lower().replace(' ','%20') in driver.current_url.lower())
+        assert query.lower().replace(' ','%20') in driver.current_url.lower()
 
-        self.assertTrue(len(post_operator.get_posts()) >= MIN_NUMBER_OF_POSTS)
+        assert len(post_operator.get_posts()) >= MIN_NUMBER_OF_POSTS
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,18 +11,20 @@ URL = "https://www.tumblr.com"
 EMAIL = os.environ['EMAIL']
 PASSWORD = os.environ['PASSWORD']
 
-TEST_SCRIPTS_BEFORE_LOGIN = ['main.py']
-TEST_SCRIPTS_AFTER_LOGIN = ['creation.py', 'discover.py']
+TEST_SCRIPTS_BEFORE_LOGIN = ['./login/main.py']
+TEST_SCRIPTS_AFTER_LOGIN = ['./account/main.py', './creation/main.py', './discover/main.py', './dashboard/main.py']
 
 def run_tests(scripts_list, driver):
 	for script in scripts_list:
 		print('Running tests from ' + script + ' ...')
+
 		print(call(['python', script, '-v'], \
 			env = {'SESSION_URL' : driver.command_executor._url, 'SESSION_ID' : driver.session_id, 
 					'DISPLAY' : ':0.0', 'EMAIL' : EMAIL, 'PASSWORD' : PASSWORD}))
 
 def show_session_info(driver):
 	print('Session started')
+	print('SESSION_URL=' + driver.command_executor._url + ' SESSION_ID=' + driver.session_id + ' python ./account/main.py -v')
 	print('url : ' + driver.command_executor._url)
 	print('session id : ' + driver.session_id)
 

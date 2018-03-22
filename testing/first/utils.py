@@ -61,14 +61,7 @@ class PresenceChecker:
 
     def is_there_reblogged_post(self, post_operator, post_id, post_note):
         for post in post_operator.get_reblogged_posts():
-
-            
-            print('id:',post_operator.get_original_post_id(post))
-            print('compared to:',str(post_id))
-            
             if (post_operator.get_original_post_id(post) == str(post_id)):
-            	print('text:', post.text)
-            	print(post_note in post.text)
              	if (post_note in post.text):
                 	return True
         return False
@@ -238,4 +231,42 @@ class ButtonGetter:
         for item in self.driver.find_elements_by_class_name('blog-sub-nav-item-link'):
                 if 'Posts' in item.text:
                     return item
+
+    def get_signup_login_button(self):
+        return self.driver.find_element_by_id("signup_login_button")
+
+    def get_logout_button(self):
+        return self.driver.find_element_by_id('logout_button')
+
+    def get_ok_button(self):
+        return self.driver.find_element_by_class_name('btn_1')
+
+class PageParser:
+
+    def __init__(self, driver):
+        self.driver = driver
+
+    def get_email_input_field(self):
+        return self.driver.find_element_by_id("signup_determine_email")
+
+    def get_password_input_field(self):
+        return self.driver.find_element_by_id("signup_password")
+
+    def get_error_message(self):
+        return self.driver.find_element_by_id("signup_form_errors")
+
+    def get_search_field(self):
+        return self.driver.find_element_by_id("search_query")
+
+    def get_search_results_container(self):
+        return self.driver.find_element_by_id("search_results_container")
+
+    def get_posts_content(self):
+        return self.driver.find_elements_by_class_name("post_content_inner")
+
+    def get_dots(self):
+        return self.driver.find_elements_by_class_name("dot")
+
+    def expand_class(self, searched_class):
+        return self.driver.find_element_by_class_name(searched_class).get_attribute('class')
 
