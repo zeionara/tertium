@@ -116,7 +116,7 @@ class SettingsTest(AccountTest):
         time.sleep(1)
         action_handler.switch(labs_switcher)
 
-@unittest.skip("skipping")
+#@unittest.skip("skipping")
 class HelpTest(AccountTest):
 
     def test_calling_help_succeeded(self):
@@ -134,7 +134,7 @@ class HelpTest(AccountTest):
 
         assert HELP_DOMAIN in self.driver.current_url
 
-@unittest.skip("skipping")
+#@unittest.skip("skipping")
 class ActivityTest(AccountTest):
 
     def test_calling_activity_succeeded(self):
@@ -149,7 +149,7 @@ class ActivityTest(AccountTest):
 
         assert presence_checker.is_there_activity_popover()
 
-@unittest.skip("skipping")
+#@unittest.skip("skipping")
 class MessagingTest(AccountTest):
 
     def test_messaging_succeeded(self):
@@ -164,7 +164,7 @@ class MessagingTest(AccountTest):
 
         assert presence_checker.is_there_messaging_inbox()
 
-@unittest.skip("skipping")
+#@unittest.skip("skipping")
 class InboxTest(AccountTest):
 
     def test_inbox_redirect_succeeded(self):
